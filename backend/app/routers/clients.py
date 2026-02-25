@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from typing import List
 from app.database import get_db
 from app.models.client import Client
+from app.models.deal import Deal
 from app.models.user import User
 from app.schemas.client import ClientCreate, ClientUpdate, ClientOut
 from app.services.auth import get_current_user
@@ -58,5 +59,7 @@ async def delete_client(client_id: int, db: AsyncSession = Depends(get_db), _: U
     client = result.scalar_one_or_none()
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
+    # Delete related deals first
+    await db.execute(delete(Deal).where(Deal.client_id == client_id))
     await db.delete(client)
     return {"ok": True}
