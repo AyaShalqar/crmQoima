@@ -11,9 +11,14 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Override URL from env
-db_url = os.environ.get("DATABASE_URL_SYNC")
+# Override URL from env - handle Railway's DATABASE_URL format
+db_url = os.environ.get("DATABASE_URL_SYNC") or os.environ.get("DATABASE_URL")
 if db_url:
+    # Railway provides postgres:// but psycopg2 needs postgresql://
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+    # Remove asyncpg if present (alembic uses sync driver)
+    db_url = db_url.replace("postgresql+asyncpg://", "postgresql://")
     config.set_main_option("sqlalchemy.url", db_url)
 
 from app.database import Base
