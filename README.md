@@ -243,3 +243,4 @@ python -m app.seed
 | Notes               | ✅    | ✅  | ✅  | ✅     |
 | View Team           | ✅    | ✅  | ❌  | ❌     |
 | Create Users        | ✅    | ❌  | ❌  | ❌     |
+# crmQoima
