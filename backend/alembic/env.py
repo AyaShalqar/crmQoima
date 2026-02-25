@@ -1,26 +1,30 @@
 import os
 from logging.config import fileConfig
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import engine_from_config, pool, create_engine
+from sqlalchemy.orm import DeclarativeBase
 from alembic import context
-from dotenv import load_dotenv
-
-load_dotenv()
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Override URL from env - handle Railway's DATABASE_URL format
+# Get DATABASE_URL from environment - handle Railway's format
 db_url = os.environ.get("DATABASE_URL_SYNC") or os.environ.get("DATABASE_URL")
-if db_url:
-    # Railway provides postgres:// but psycopg2 needs postgresql://
-    if db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql://", 1)
-    # Remove asyncpg if present (alembic uses sync driver)
-    db_url = db_url.replace("postgresql+asyncpg://", "postgresql://")
-    config.set_main_option("sqlalchemy.url", db_url)
+print(f"DATABASE_URL from env: {db_url[:50] if db_url else 'NOT SET'}...")
 
+if not db_url:
+    raise RuntimeError("DATABASE_URL environment variable is not set!")
+
+# Railway provides postgres:// but psycopg2 needs postgresql://
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+# Remove asyncpg if present (alembic uses sync driver)
+db_url = db_url.replace("postgresql+asyncpg://", "postgresql://")
+config.set_main_option("sqlalchemy.url", db_url)
+print(f"Final DB URL: {db_url[:50]}...")
+
+# Import models AFTER setting URL
 from app.database import Base
 import app.models  # noqa: ensure all models are imported
 
