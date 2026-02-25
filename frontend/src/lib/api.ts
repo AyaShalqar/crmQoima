@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://stunning-blessing-production-b9e4.up.railway.app';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://stunning-blessing-production-e9c1.up.railway.app';
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
