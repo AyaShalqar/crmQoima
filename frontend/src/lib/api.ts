@@ -102,4 +102,8 @@ export const api = {
     if (dateTo) params.set('date_to', dateTo);
     return request(`/api/dashboard/kpi?${params.toString()}`);
   },
+
+  // Settings
+  getBalance: () => request('/api/settings/balance'),
+  updateBalance: (amount: number) => request('/api/settings/balance', { method: 'PUT', body: JSON.stringify({ amount }) }),
 };

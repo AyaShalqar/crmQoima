@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import Modal from '@/components/Modal';
-import { Plus, Trash2, TrendingUp, TrendingDown, Wallet, Landmark } from 'lucide-react';
+import { Plus, Trash2, TrendingUp, TrendingDown, Wallet, Landmark, Pencil } from 'lucide-react';
 
 const CATEGORIES = ['SALARY', 'TOOLS', 'MARKETING', 'OFFICE', 'OTHER'] as const;
 const CATEGORY_LABELS: Record<string, string> = {
@@ -18,15 +18,18 @@ export default function FinancePage() {
   const [incomes, setIncomes] = useState<any[]>([]);
   const [expenses, setExpenses] = useState<any[]>([]);
   const [report, setReport] = useState<any[]>([]);
+  const [balance, setBalance] = useState<number>(0);
   const [tab, setTab] = useState<'income' | 'expenses' | 'report'>('report');
-  const [showModal, setShowModal] = useState<'income' | 'expense' | null>(null);
+  const [showModal, setShowModal] = useState<'income' | 'expense' | 'balance' | null>(null);
   const [form, setForm] = useState({ date: '', amount: '', source: '', comment: '', category: 'OTHER' });
+  const [balanceInput, setBalanceInput] = useState('');
 
   const load = async () => {
-    const [i, e, r] = await Promise.all([api.getIncomes(), api.getExpenses(), api.getFinanceReport()]);
+    const [i, e, r, b] = await Promise.all([api.getIncomes(), api.getExpenses(), api.getFinanceReport(), api.getBalance()]);
     setIncomes(i);
     setExpenses(e);
     setReport(r);
+    setBalance(b.amount);
   };
 
   useEffect(() => { load(); }, []);
@@ -73,12 +76,16 @@ export default function FinancePage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="card p-5">
+        <div
+          className="card p-5 cursor-pointer hover:shadow-md transition-shadow group"
+          onClick={() => { setBalanceInput(String(balance)); setShowModal('balance'); }}
+        >
           <div className="flex items-center gap-2 mb-2">
             <div className="p-1.5 rounded-lg bg-brand-50"><Landmark size={16} className="text-brand-600" /></div>
             <span className="text-sm text-slate-500">Баланс на счету</span>
+            <Pencil size={12} className="text-slate-300 group-hover:text-slate-500 ml-auto" />
           </div>
-          <div className={`text-xl font-bold ${totalIncome - totalExpenses >= 0 ? 'text-brand-600' : 'text-red-600'}`}>{fmt(totalIncome - totalExpenses)}</div>
+          <div className={`text-xl font-bold ${balance >= 0 ? 'text-brand-600' : 'text-red-600'}`}>{fmt(balance)}</div>
         </div>
         <div className="card p-5">
           <div className="flex items-center gap-2 mb-2">
@@ -208,7 +215,7 @@ export default function FinancePage() {
       </div>
 
       {/* Add Income/Expense Modal */}
-      <Modal open={!!showModal} onClose={() => setShowModal(null)} title={showModal === 'income' ? 'Добавить доход' : 'Добавить расход'}>
+      <Modal open={showModal === 'income' || showModal === 'expense'} onClose={() => setShowModal(null)} title={showModal === 'income' ? 'Добавить доход' : 'Добавить расход'}>
         <form onSubmit={handleCreate} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -240,6 +247,33 @@ export default function FinancePage() {
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={() => setShowModal(null)} className="btn-secondary btn-sm">Отмена</button>
             <button type="submit" className="btn-primary btn-sm">Добавить</button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Edit Balance Modal */}
+      <Modal open={showModal === 'balance'} onClose={() => setShowModal(null)} title="Редактировать баланс">
+        <form onSubmit={async (e) => {
+          e.preventDefault();
+          await api.updateBalance(Number(balanceInput));
+          setShowModal(null);
+          load();
+        }} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Баланс на счету (₸)</label>
+            <input
+              type="number"
+              step="0.01"
+              className="input-field"
+              value={balanceInput}
+              onChange={e => setBalanceInput(e.target.value)}
+              required
+              autoFocus
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <button type="button" onClick={() => setShowModal(null)} className="btn-secondary btn-sm">Отмена</button>
+            <button type="submit" className="btn-primary btn-sm">Сохранить</button>
           </div>
         </form>
       </Modal>

@@ -17,11 +17,11 @@ interface KPI {
   growth_mom: number;
   active_users: number;
   deal_counts: Record<string, number>;
-  balance: number;
 }
 
 export default function DashboardPage() {
   const [kpi, setKpi] = useState<KPI | null>(null);
+  const [balance, setBalance] = useState<number>(0);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [loading, setLoading] = useState(true);
@@ -29,8 +29,12 @@ export default function DashboardPage() {
   const load = async () => {
     setLoading(true);
     try {
-      const data = await api.getKPI(dateFrom || undefined, dateTo || undefined);
+      const [data, balanceData] = await Promise.all([
+        api.getKPI(dateFrom || undefined, dateTo || undefined),
+        api.getBalance()
+      ]);
       setKpi(data);
+      setBalance(balanceData.amount);
     } catch (e) {
       console.error(e);
     } finally {
@@ -47,7 +51,7 @@ export default function DashboardPage() {
   const growthColor = kpi && kpi.growth_mom > 0 ? 'text-emerald-600' : kpi && kpi.growth_mom < 0 ? 'text-red-600' : 'text-slate-500';
 
   const metrics = kpi ? [
-    { label: 'Баланс на счету', value: fmt(kpi.balance), icon: Wallet, color: kpi.balance >= 0 ? 'bg-brand-50 text-brand-600' : 'bg-red-50 text-red-600', ring: kpi.balance >= 0 ? 'ring-brand-100' : 'ring-red-100' },
+    { label: 'Баланс на счету', value: fmt(balance), icon: Wallet, color: balance >= 0 ? 'bg-brand-50 text-brand-600' : 'bg-red-50 text-red-600', ring: balance >= 0 ? 'ring-brand-100' : 'ring-red-100' },
     { label: 'Выручка', value: fmt(kpi.revenue), icon: Banknote, color: 'bg-emerald-50 text-emerald-600', ring: 'ring-emerald-100' },
     { label: 'MRR', value: fmt(kpi.mrr), icon: BarChart3, color: 'bg-blue-50 text-blue-600', ring: 'ring-blue-100' },
     { label: 'В работе', value: fmt(kpi.pipeline), icon: Target, color: 'bg-amber-50 text-amber-600', ring: 'ring-amber-100' },
