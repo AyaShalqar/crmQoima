@@ -39,7 +39,7 @@ export default function DealsPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
-  const [form, setForm] = useState({ client_id: '', title: '', amount: '', currency: 'USD', status: 'LEAD', probability: '0', expected_close_date: '' });
+  const [form, setForm] = useState({ client_id: '', title: '', amount: '', currency: 'KZT', status: 'LEAD', probability: '0', expected_close_date: '' });
   const [commentDeal, setCommentDeal] = useState<Deal | null>(null);
   const [comments, setComments] = useState<any[]>([]);
   const [newComment, setNewComment] = useState('');
@@ -55,11 +55,11 @@ export default function DealsPage() {
 
   const clientName = (id: number) => clients.find(c => c.id === id)?.company_name || '—';
   const userName = (id: number) => users.find(u => u.id === id)?.name || '—';
-  const fmt = (n: number) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
+  const fmt = (n: number) => new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(n) + ' ₸';
 
   const openNew = () => {
     setEditId(null);
-    setForm({ client_id: '', title: '', amount: '', currency: 'USD', status: 'LEAD', probability: '0', expected_close_date: '' });
+    setForm({ client_id: '', title: '', amount: '', currency: 'KZT', status: 'LEAD', probability: '0', expected_close_date: '' });
     setShowModal(true);
   };
 

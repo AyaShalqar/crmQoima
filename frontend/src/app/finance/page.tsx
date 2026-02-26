@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import Modal from '@/components/Modal';
-import { Plus, Trash2, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { Plus, Trash2, TrendingUp, TrendingDown, Wallet, Landmark } from 'lucide-react';
 
 const CATEGORIES = ['SALARY', 'TOOLS', 'MARKETING', 'OFFICE', 'OTHER'] as const;
 const CATEGORY_LABELS: Record<string, string> = {
@@ -31,7 +31,7 @@ export default function FinancePage() {
 
   useEffect(() => { load(); }, []);
 
-  const fmt = (n: number) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
+  const fmt = (n: number) => new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(n) + ' ₸';
 
   const totalIncome = incomes.reduce((s, i) => s + i.amount, 0);
   const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
@@ -72,7 +72,14 @@ export default function FinancePage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="card p-5">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1.5 rounded-lg bg-brand-50"><Landmark size={16} className="text-brand-600" /></div>
+            <span className="text-sm text-slate-500">Баланс на счету</span>
+          </div>
+          <div className={`text-xl font-bold ${totalIncome - totalExpenses >= 0 ? 'text-brand-600' : 'text-red-600'}`}>{fmt(totalIncome - totalExpenses)}</div>
+        </div>
         <div className="card p-5">
           <div className="flex items-center gap-2 mb-2">
             <div className="p-1.5 rounded-lg bg-emerald-50"><TrendingUp size={16} className="text-emerald-600" /></div>

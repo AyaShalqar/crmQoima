@@ -76,6 +76,19 @@ async def get_kpi(
     )
     deal_counts = {str(r[0].value): r[1] for r in deal_counts_q.all()}
 
+    # Total balance (all-time income - all-time expenses)
+    total_income_result = await db.execute(
+        select(func.coalesce(func.sum(Income.amount), 0))
+    )
+    total_income = float(total_income_result.scalar())
+
+    total_expense_result = await db.execute(
+        select(func.coalesce(func.sum(Expense.amount), 0))
+    )
+    total_expense = float(total_expense_result.scalar())
+
+    balance = total_income - total_expense
+
     return {
         "revenue": round(revenue, 2),
         "mrr": round(mrr, 2),
@@ -86,4 +99,5 @@ async def get_kpi(
         "growth_mom": round(growth_mom, 2),
         "active_users": active_users,
         "deal_counts": deal_counts,
+        "balance": round(balance, 2),
     }

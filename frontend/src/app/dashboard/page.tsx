@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import {
-  DollarSign, TrendingUp, Target, PiggyBank, Users,
-  BarChart3, ArrowUpRight, ArrowDownRight, Minus
+  Wallet, TrendingUp, Target, PiggyBank,
+  BarChart3, ArrowUpRight, ArrowDownRight, Minus, Banknote
 } from 'lucide-react';
 
 interface KPI {
@@ -17,6 +17,7 @@ interface KPI {
   growth_mom: number;
   active_users: number;
   deal_counts: Record<string, number>;
+  balance: number;
 }
 
 export default function DashboardPage() {
@@ -39,19 +40,19 @@ export default function DashboardPage() {
 
   useEffect(() => { load(); }, []);
 
-  const fmt = (n: number) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
+  const fmt = (n: number) => new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(n) + ' ₸';
   const pct = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(1)}%`;
 
   const GrowthIcon = kpi && kpi.growth_mom > 0 ? ArrowUpRight : kpi && kpi.growth_mom < 0 ? ArrowDownRight : Minus;
   const growthColor = kpi && kpi.growth_mom > 0 ? 'text-emerald-600' : kpi && kpi.growth_mom < 0 ? 'text-red-600' : 'text-slate-500';
 
   const metrics = kpi ? [
-    { label: 'Выручка', value: fmt(kpi.revenue), icon: DollarSign, color: 'bg-emerald-50 text-emerald-600', ring: 'ring-emerald-100' },
+    { label: 'Баланс на счету', value: fmt(kpi.balance), icon: Wallet, color: kpi.balance >= 0 ? 'bg-brand-50 text-brand-600' : 'bg-red-50 text-red-600', ring: kpi.balance >= 0 ? 'ring-brand-100' : 'ring-red-100' },
+    { label: 'Выручка', value: fmt(kpi.revenue), icon: Banknote, color: 'bg-emerald-50 text-emerald-600', ring: 'ring-emerald-100' },
     { label: 'MRR', value: fmt(kpi.mrr), icon: BarChart3, color: 'bg-blue-50 text-blue-600', ring: 'ring-blue-100' },
     { label: 'В работе', value: fmt(kpi.pipeline), icon: Target, color: 'bg-amber-50 text-amber-600', ring: 'ring-amber-100' },
     { label: 'Прибыль', value: fmt(kpi.profit), icon: PiggyBank, color: kpi.profit >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600', ring: kpi.profit >= 0 ? 'ring-emerald-100' : 'ring-red-100' },
-    { label: 'Расходы', value: fmt(kpi.expenses), icon: DollarSign, color: 'bg-red-50 text-red-600', ring: 'ring-red-100' },
-    { label: 'Выручка / сотр.', value: fmt(kpi.revenue_per_employee), icon: Users, color: 'bg-violet-50 text-violet-600', ring: 'ring-violet-100' },
+    { label: 'Расходы', value: fmt(kpi.expenses), icon: Banknote, color: 'bg-red-50 text-red-600', ring: 'ring-red-100' },
   ] : [];
 
   return (

@@ -18,7 +18,7 @@ class Deal(Base):
     client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
     title = Column(String(255), nullable=False)
     amount = Column(Numeric(12, 2), default=0)
-    currency = Column(String(3), default="USD")
+    currency = Column(String(3), default="KZT")
     status = Column(Enum(DealStatus), default=DealStatus.LEAD)
     probability = Column(Integer, default=0)  # 0-100%
     expected_close_date = Column(DateTime(timezone=True))
