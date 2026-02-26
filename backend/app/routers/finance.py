@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, extract
+from sqlalchemy import select, func, extract, literal_column
 from typing import List
 from app.database import get_db
 from app.models.finance import Income, Expense
@@ -24,6 +24,7 @@ async def create_income(data: IncomeCreate, db: AsyncSession = Depends(get_db), 
     db.add(income)
     await db.flush()
     await db.refresh(income)
+    await db.commit()
     return IncomeOut.model_validate(income)
 
 
@@ -50,6 +51,7 @@ async def create_expense(data: ExpenseCreate, db: AsyncSession = Depends(get_db)
     db.add(expense)
     await db.flush()
     await db.refresh(expense)
+    await db.commit()
     return ExpenseOut.model_validate(expense)
 
 
@@ -66,23 +68,23 @@ async def delete_expense(expense_id: int, db: AsyncSession = Depends(get_db), _:
 # --- Monthly report ---
 @router.get("/report", response_model=List[MonthlyReport])
 async def monthly_report(db: AsyncSession = Depends(get_db), _: User = Depends(get_current_user)):
-    # Revenue by month
+    # Revenue by month - group by column index (1 = first column in SELECT)
     inc_q = await db.execute(
         select(
             func.to_char(Income.date, 'YYYY-MM').label("month"),
-            func.coalesce(func.sum(Income.amount), 0).label("total"),
-        ).group_by(func.to_char(Income.date, 'YYYY-MM'))
+            func.sum(Income.amount).label("total"),
+        ).group_by(literal_column("1"))
     )
-    rev_map = {r.month: float(r.total) for r in inc_q.all()}
+    rev_map = {r.month: float(r.total) if r.total else 0 for r in inc_q.all()}
 
     # Expenses by month
     exp_q = await db.execute(
         select(
             func.to_char(Expense.date, 'YYYY-MM').label("month"),
-            func.coalesce(func.sum(Expense.amount), 0).label("total"),
-        ).group_by(func.to_char(Expense.date, 'YYYY-MM'))
+            func.sum(Expense.amount).label("total"),
+        ).group_by(literal_column("1"))
     )
-    exp_map = {r.month: float(r.total) for r in exp_q.all()}
+    exp_map = {r.month: float(r.total) if r.total else 0 for r in exp_q.all()}
 
     months = sorted(set(list(rev_map.keys()) + list(exp_map.keys())))
     return [
