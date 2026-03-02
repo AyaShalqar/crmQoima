@@ -6,5 +6,6 @@ from app.models.finance import Income, Expense
 from app.models.note import Note
 from app.models.settings import CompanyBalance
 from app.models.event import Event
+from app.models.project import Project
 
-__all__ = ["User", "Client", "Deal", "DealComment", "Task", "Income", "Expense", "Note", "CompanyBalance", "Event"]
+__all__ = ["User", "Client", "Deal", "DealComment", "Task", "Income", "Expense", "Note", "CompanyBalance", "Event", "Project"]

@@ -132,4 +132,30 @@ export const api = {
   createEvent: (data: any) => request('/api/events/', { method: 'POST', body: JSON.stringify(data) }),
   updateEvent: (id: number, data: any) => request(`/api/events/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteEvent: (id: number) => request(`/api/events/${id}`, { method: 'DELETE' }),
+
+  // Projects
+  getProjects: () => request('/api/projects/'),
+  createProject: (data: any) => request('/api/projects/', { method: 'POST', body: JSON.stringify(data) }),
+  updateProject: (id: number, data: any) => request(`/api/projects/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteProject: (id: number) => request(`/api/projects/${id}`, { method: 'DELETE' }),
+  generateShareLink: (id: number) => request(`/api/projects/${id}/share`, { method: 'POST' }),
+  revokeShareLink: (id: number) => request(`/api/projects/${id}/share`, { method: 'DELETE' }),
 };
+
+// Special function for file download with auth
+export async function downloadProjectsExcel() {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/projects/export`, {
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new Error('Export failed');
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'projects.xlsx';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
