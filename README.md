@@ -16,6 +16,7 @@
 
 ## Quick Start
 
+
 ```bash
 # 1. Clone and navigate
 cd qoima-crm
@@ -189,48 +190,8 @@ cd backend
 python -m app.seed
 ```
 
-## Deploy to Railway
 
-### 1. Создать проект
-1. Зайди на [railway.app](https://railway.app) и создай новый проект
-2. Подключи GitHub репозиторий
 
-### 2. Добавить PostgreSQL
-1. В проекте нажми **+ New** → **Database** → **PostgreSQL**
-2. Railway автоматически создаст переменную `DATABASE_URL`
-
-### 3. Деплой Backend
-1. **+ New** → **GitHub Repo** → выбери репозиторий
-2. В настройках сервиса:
-   - **Root Directory:** `backend`
-   - **Variables:**
-     ```
-     DATABASE_URL=${{Postgres.DATABASE_URL}}
-     SECRET_KEY=your-secure-random-key-here
-     CORS_ORIGINS=https://your-frontend.up.railway.app
-     ```
-3. Скопируй URL бэкенда (например: `https://qoima-backend.up.railway.app`)
-
-### 4. Деплой Frontend
-1. **+ New** → **GitHub Repo** → выбери тот же репозиторий
-2. В настройках сервиса:
-   - **Root Directory:** `frontend`
-   - **Variables:**
-     ```
-     NEXT_PUBLIC_API_URL=https://qoima-backend.up.railway.app
-     ```
-
-### 5. Обновить CORS
-После деплоя фронтенда, обнови `CORS_ORIGINS` в бэкенде на реальный URL фронтенда.
-
-### Environment Variables
-
-| Service  | Variable              | Description                         |
-|----------|-----------------------|-------------------------------------|
-| Backend  | DATABASE_URL          | PostgreSQL connection string        |
-| Backend  | SECRET_KEY            | JWT signing key (generate random)   |
-| Backend  | CORS_ORIGINS          | Frontend URL(s), comma-separated    |
-| Frontend | NEXT_PUBLIC_API_URL   | Backend API URL                     |
 
 ## RBAC
 
@@ -243,4 +204,3 @@ python -m app.seed
 | Notes               | ✅    | ✅  | ✅  | ✅     |
 | View Team           | ✅    | ✅  | ❌  | ❌     |
 | Create Users        | ✅    | ❌  | ❌  | ❌     |
-# crmQoima

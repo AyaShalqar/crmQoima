@@ -81,13 +81,28 @@ export const api = {
   deleteTask: (id: number) => request(`/api/tasks/${id}`, { method: 'DELETE' }),
 
   // Finance
-  getIncomes: () => request('/api/finance/incomes'),
+  getIncomes: (dateFrom?: string, dateTo?: string) => {
+    const params = new URLSearchParams();
+    if (dateFrom) params.set('date_from', dateFrom);
+    if (dateTo) params.set('date_to', dateTo);
+    return request(`/api/finance/incomes?${params.toString()}`);
+  },
   createIncome: (data: any) => request('/api/finance/incomes', { method: 'POST', body: JSON.stringify(data) }),
   deleteIncome: (id: number) => request(`/api/finance/incomes/${id}`, { method: 'DELETE' }),
-  getExpenses: () => request('/api/finance/expenses'),
+  getExpenses: (dateFrom?: string, dateTo?: string) => {
+    const params = new URLSearchParams();
+    if (dateFrom) params.set('date_from', dateFrom);
+    if (dateTo) params.set('date_to', dateTo);
+    return request(`/api/finance/expenses?${params.toString()}`);
+  },
   createExpense: (data: any) => request('/api/finance/expenses', { method: 'POST', body: JSON.stringify(data) }),
   deleteExpense: (id: number) => request(`/api/finance/expenses/${id}`, { method: 'DELETE' }),
-  getFinanceReport: () => request('/api/finance/report'),
+  getFinanceReport: (dateFrom?: string, dateTo?: string) => {
+    const params = new URLSearchParams();
+    if (dateFrom) params.set('date_from', dateFrom);
+    if (dateTo) params.set('date_to', dateTo);
+    return request(`/api/finance/report?${params.toString()}`);
+  },
 
   // Notes
   getNotes: () => request('/api/notes/'),
@@ -106,4 +121,15 @@ export const api = {
   // Settings
   getBalance: () => request('/api/settings/balance'),
   updateBalance: (amount: number) => request('/api/settings/balance', { method: 'PUT', body: JSON.stringify({ amount }) }),
+
+  // Events (Calendar)
+  getEvents: (start?: string, end?: string) => {
+    const params = new URLSearchParams();
+    if (start) params.set('start', start);
+    if (end) params.set('end', end);
+    return request(`/api/events/?${params.toString()}`);
+  },
+  createEvent: (data: any) => request('/api/events/', { method: 'POST', body: JSON.stringify(data) }),
+  updateEvent: (id: number, data: any) => request(`/api/events/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteEvent: (id: number) => request(`/api/events/${id}`, { method: 'DELETE' }),
 };

@@ -5,11 +5,12 @@ import { usePathname } from 'next/navigation';
 import { getUser, clearToken } from '@/lib/api';
 import {
   LayoutDashboard, CheckSquare, Users, Briefcase, HandCoins,
-  FileText, UserCog, LogOut, ChevronRight
+  FileText, UserCog, LogOut, ChevronRight, Calendar
 } from 'lucide-react';
 
 const nav = [
   { href: '/dashboard', label: 'Дашборд', icon: LayoutDashboard },
+  { href: '/calendar', label: 'Календарь', icon: Calendar },
   { href: '/tasks', label: 'Задачи', icon: CheckSquare },
   { href: '/crm/clients', label: 'Клиенты', icon: Users },
   { href: '/crm/deals', label: 'Сделки', icon: Briefcase },
